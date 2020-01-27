@@ -1,0 +1,1 @@
+fflush: function (vider les buffers d'un flux)

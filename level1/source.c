@@ -7,7 +7,7 @@ int run(void)
 	return system("/bin/sh");
 }
 
-int main(int argc, char **argv)
+int main()
 {
 	char str[64];
 

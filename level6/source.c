@@ -21,7 +21,7 @@ int main(int ac, char **av)
 	
 	f = malloc(4);
 	*f = m;
-	strcpy(buff, av[1]); //to check
+	strcpy(buff, av[1]);
 	f();
 	return (0);
 }

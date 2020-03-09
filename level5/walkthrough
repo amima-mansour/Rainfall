@@ -6,10 +6,11 @@ AAAA41414141
 Offest = 4
 2- o function is never called and it contains the system function
 We notice the presence of exit function at the end of n function, so :
-	- objdump -R level5
+	objdump -R level5
 	address of exit function =  0x08049838
 	- we have to modify this address to call o function
-	objdump -d level5
+	x/x o
+	0x80484a4 <o>:	0x83e58955
 	address of the o function = 0x080484a4
 	- We have to replace 0x08049838 by 0x080484a4
 	These two address start with 0x0804, we have just to modify the other digits.

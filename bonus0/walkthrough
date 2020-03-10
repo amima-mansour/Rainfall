@@ -1,4 +1,4 @@
-Strcpy is vulnerable to Buffer Overflow
+strcpy => Buffer Overflow
 0x08048559 <+59>:	call   0x80483a0 <strcpy@plt>
 
 # Let's find a which offset the program segfault

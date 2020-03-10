@@ -5,7 +5,7 @@
 
 char *p(char *str1, char *str2)
 {
-	char [4104]str2;
+	char [4104]str3;
 	
 	puts(str1);
 	read(0, &str2, 4096);

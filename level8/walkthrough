@@ -10,8 +10,8 @@ and system command in the LOGIN block:
 The LOGIN command block:
 
 The condition to enter to the system block:
-<+382>:	mov    0x8049aac,%eax // 0x08049aac = auth variable, at 0x804a008 
-<+387>:	mov    0x20(%eax),%eax
+<+382>:	mov    0x8049aac,%eax // 0x08049aac = auth variable, at 0x804a008
+<+387>:	mov    0x20(%eax),%eax //auth + 32 == '\0'
 <+390>:	test   %eax,%eax
 <+392>:	je     0x80486ff <main+411>
 

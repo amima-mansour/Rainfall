@@ -2,8 +2,8 @@
 #include <string.h>
 #include <stdio.h>
 
-char *sevice;
-char *auth;
+char *sevice = NULL;
+char *auth = NULL;
 
 int main(void)
 {
@@ -14,7 +14,7 @@ int main(void)
 		printf("%p, %p \n", auth, service);
 		if (!fgets(str, 128, stdin))
 			break ;
-		if (strncmp(str, "auth", 5) == 0)
+		if (strncmp(str, "auth ", 5) == 0)
 		{
 			auth = (char*)malloc(4);
 			char *str1 = str + 5;

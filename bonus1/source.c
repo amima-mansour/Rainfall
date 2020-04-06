@@ -5,13 +5,13 @@
 int main(int argc, char **argv)
 {
 	int			a;
-	char[40]	str; //0x3c - 0x14 = 60 - 20 = 40
+	char	str[40];
 
 	a = atoi(argv[1]);
-	if (a >= 10)
+	if (a > 9)
 		return (1);
 	memcpy(str, argv[2], a * 4);
-	if (a ==  1464814662)
+	if (a ==  0x574f4c46)
 		excel("/bin/sh","sh", 0);
 	return (0);
 }

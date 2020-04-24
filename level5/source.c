@@ -10,7 +10,7 @@ void o(void)
 
 void n(void)
 {
-	char[520] buf;
+	char buf[520];
 
 	fgets(buf, 512, stdin);
 	printf(buf);

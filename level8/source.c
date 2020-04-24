@@ -7,7 +7,7 @@ char *auth = NULL;
 
 int main(void)
 {
-	char[128] str;
+	char str[128];
 
 	while(1)
 	{

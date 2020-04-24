@@ -7,7 +7,7 @@ int language = 0;
 
 int greetuser(char *input)
 {
-  char str[20]; // to check
+  char str[88];
 
   if (language == 1)
     strcpy(str, "Hyvää päivää ");
@@ -25,18 +25,18 @@ int main(int argc,char **argv)
   char *lang;
 
   if (argc != 3)
-	  return (1);
-  memcpy(str, 0, 19); //https://stackoverflow.com/questions/17016337/trying-to-understand-assembly-code
+	return (1);
+  memcpy(str, 0, 19);
   strncpy(str, argv[1], 40);
-  strncpy(&str[40], argv[2], 32);
+  strncpy(str + 40, argv[2], 32);
   lang = getenv("LANG");
   if (lang)
   {
 	  if (memcmp(lang, "fi", 2) == 0)
-		  language = 1;
-    else if (memcmp(lang, "nl", 2) == 0)
-      language = 2;
-    strncpy(lang, str, 19);
-   }
-    return greetuser(&(str[40]));
+		language = 1;
+	  else if (memcmp(lang, "nl", 2) == 0)
+		language = 2;
+	}
+	greetuser(str);
+	return(0);
 }

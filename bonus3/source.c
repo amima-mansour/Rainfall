@@ -6,22 +6,23 @@
 int main(int argc,char **argv)
 {
     FILE *fs;
-    char str1[66];
-    char str2[65];
-    
-    fs = fopen("/home/user/end/.pass","r");
-    if (!fs || argc != 2)
+    char buffer[24];
+	char buffer2[66];
+
+	fs = fopen("/home/user/end/.pass","r");
+	bzero(buffer, 33);
+	if (!fs || argc != 2)
         return -1;
 
-    fread(str1, 1, 66, fs);
-    str1[atoi(argv[1])] = 0;
+    fread(buffer, 1, 66, fs);
+    buffer[atoi(argv[1])] = 0;
 
-    fread(str2, 1, 65, fs);
+    fread(buffer2, 1, 65, fs);
     fclose(fs);
 
     if (strcmp(str1, argv[1]) == 0)
         execl("/bin/sh","sh",0);
     else
-        puts(str2);
+        puts(buffer2);
     return 0;
 }

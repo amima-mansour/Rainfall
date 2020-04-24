@@ -1,20 +1,19 @@
-open the '.pass' file
-   0x08048513 <+31>:	call   0x8048410 <fopen@plt>
-Then read it
-   0x0804856f <+123>:	call   0x80483d0 <fread@plt>
-
-call atoi on argv[1], then put a '\0' at that number in the '.pass' buffer
+# open the "/home/user/end/.pass" file and read it twice
+# call atoi on argv[1], then put a '\0' at that number in the first buffer
    0x08048584 <+144>:	call   0x8048430 <atoi@plt>
    0x08048589 <+149>:	mov    BYTE PTR [esp+eax*1+0x18],0x0
 
-strcmp: to compare the '.pass' buffer against argv[1]
+# strcmp: to compare the "/home/user/end/.pass" buffer against argv[1]
    0x080485da <+230>:	call   0x80483b0 <strcmp@plt>
    0x080485df <+235>:	test   eax,eax
 
-if comparaison == 0: 
+# if comparaison == 0: 
    0x080485fa <+262>:	call   0x8048420 <execl@plt>
 
-buffer[0] = 0 and atoi("") == 0
+
+# we know that buffer[0] = 0 and atoi("") == 0
+# so :
 bonus3@RainFall:~$ ./bonus3 ""
 $ cat /home/user/end/.pass
 3321b6f81659f9a71c76616f606e4b50189cecfea611393d5d649f75e157353c
+$ exit

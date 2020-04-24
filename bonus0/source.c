@@ -15,8 +15,8 @@ void p(char *buf, char *str)
 
 void pp(char *str)
 {
-	char [20]str1;
-	char [28]str2;
+	char str1[20];
+	char str2[28];
 	
 	p(str1, " - ");
 	p(str2, " - ");

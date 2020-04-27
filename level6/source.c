@@ -16,10 +16,11 @@ void n(void)
 
 int main(int ac, char **av)
 {
-	char *buff1 = (char*)malloc(64); 
+	char *buff;
 	void (*f)(void);
 	
-	f = malloc(4);
+	buff = (char*)malloc(64);
+	f = (void**)malloc(4);
 	*f = m;
 	strcpy(buff, av[1]);
 	f();

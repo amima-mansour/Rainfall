@@ -16,7 +16,7 @@ void n(void)
 	fgets(buf, 512, stdin);
 	p(buf);
 	if (m == 0x1025544)
-		system("/bin/cat /home/user/level5/.pass")
+		system("/bin/cat /home/user/level5/.pass");
 	return ;
 }
 

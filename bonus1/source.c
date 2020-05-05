@@ -1,6 +1,6 @@
-#include <string.h> //memcpy
-#include <unistd.h> //excel
-#include <stdlib.h> //atoi
+#include <string.h>
+#include <unistd.h>
+#include <stdlib.h>
 
 int main(int argc, char **argv)
 {

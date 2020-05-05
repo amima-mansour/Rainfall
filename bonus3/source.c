@@ -20,7 +20,7 @@ int main(int argc,char **argv)
     fread(buffer2, 1, 65, fs);
     fclose(fs);
 
-    if (strcmp(str1, argv[1]) == 0)
+    if (strcmp(buffer argv[1]) == 0)
         execl("/bin/sh","sh",0);
     else
         puts(buffer2);
